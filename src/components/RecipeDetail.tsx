@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, ChefHat, CheckCircle2 } from 'lucide-react';
@@ -26,7 +25,7 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe }) => {
     medium: 'bg-yellow-100 text-yellow-800',
     hard: 'bg-red-100 text-red-800'
   }[recipe.difficulty];
-  
+  console.log('#recipe',recipe);
   // Format time
   const formatTime = (minutes: number) => {
     if (minutes < 60) {
@@ -40,6 +39,13 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe }) => {
   // Get ingredient name from id
   const getIngredientName = (id: string) => {
     const ingredient = ingredients.find(i => i.id === id);
+    // 如果找不到匹配的食材，尝试直接返回id中的名称部分（假设id格式为"other-1"这样的格式）
+    if (!ingredient) {
+      // 如果id包含连字符，可能是"other-1"这样的格式
+      if (id.includes('-')) {
+        return id; // 暂时返回原始id，直到我们了解更多关于数据结构的信息
+      }
+    }
     return ingredient ? ingredient.name : id;
   };
 
@@ -100,13 +106,13 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe }) => {
             <ul className="space-y-3">
               {recipe.ingredients.map((ingredient, index) => (
                 <motion.li 
-                  key={ingredient.id}
+                  key={`${ingredient.id}-${ingredient.amount}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.3 }}
                   className="flex justify-between items-center bg-secondary rounded-lg p-3"
                 >
-                  <span className="font-medium">{getIngredientName(ingredient.id)}</span>
+                  <span className="font-medium">{ingredient.name}</span>
                   <span className="text-muted-foreground text-sm">{ingredient.amount}</span>
                 </motion.li>
               ))}

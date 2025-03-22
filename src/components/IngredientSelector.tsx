@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,9 +36,19 @@ const IngredientSelector: React.FC<IngredientSelectorProps> = ({ initialIngredie
 
   // Handle search button click
   const handleSearch = () => {
-    if (selectedIngredients.length > 0) {
-      navigate(`/recipes?ingredients=${selectedIngredients.join(',')}`);
+    if (selectedIngredients.length === 0) return;
+    
+    // 显示加载状态
+    const button = document.querySelector('#search-recipe-button');
+    if (button) {
+      button.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground"></div><span class="ml-2">生成中...</span>';
+      button.setAttribute('disabled', 'true');
     }
+    
+    // 构建URL参数并导航
+    const params = new URLSearchParams();
+    params.set('ingredients', selectedIngredients.join(','));
+    navigate(`/recipes?${params.toString()}`);
   };
 
   // Common ingredients for quick selection
@@ -122,6 +131,7 @@ const IngredientSelector: React.FC<IngredientSelectorProps> = ({ initialIngredie
       {/* Search button */}
       <div className="mt-8">
         <button
+          id="search-recipe-button"
           onClick={handleSearch}
           disabled={selectedIngredients.length === 0}
           className={`w-full flex items-center justify-center gap-2 rounded-lg ${

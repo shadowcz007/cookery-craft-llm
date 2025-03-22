@@ -7,6 +7,7 @@ import RecipeCard from '../components/RecipeCard';
 import IngredientSelector from '../components/IngredientSelector';
 import { findRecipesByIngredients, recipes } from '../data/recipes';
 import { ingredients } from '../data/ingredients';
+import { generateRecipe, GeneratedRecipe } from '../services/aiService';
 
 // Define the type directly instead of using ReturnType and indexing
 interface RecipeWithMatch {
@@ -31,8 +32,10 @@ const Recipes = () => {
   const [matchedRecipes, setMatchedRecipes] = useState<RecipeWithMatch[]>([]);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [showSelector, setShowSelector] = useState(false);
+  const [aiRecipe, setAiRecipe] = useState<GeneratedRecipe | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Parse ingredients from URL query
+  // Parse ingredients from URL query and generate AI recipe
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const ingredientParam = params.get('ingredients');
@@ -44,6 +47,9 @@ const Recipes = () => {
       // Find recipes that match these ingredients
       const matches = findRecipesByIngredients(ingredientIds);
       setMatchedRecipes(matches);
+
+      // Generate AI recipe
+      generateAiRecipe(ingredientIds);
     } else {
       // If no ingredients, show all recipes
       setMatchedRecipes(recipes.map(recipe => ({
@@ -51,8 +57,35 @@ const Recipes = () => {
         matchCount: 0,
         matchPercentage: 0
       })));
+      setAiRecipe(null);
     }
   }, [location.search]);
+
+  // Generate AI recipe based on selected ingredients
+  const generateAiRecipe = async (ingredientIds: string[]) => {
+    if (ingredientIds.length === 0) return;
+    
+    setIsGenerating(true);
+    
+    try {
+      // Get ingredient names for the selected IDs
+      const ingredientNames = ingredientIds.map(id => {
+        const ingredient = ingredients.find(i => i.id === id);
+        return ingredient?.name || id;
+      });
+      
+      // Call the API to generate a recipe
+      const generatedRecipe = await generateRecipe(ingredientIds, ingredientNames);
+      setAiRecipe(generatedRecipe);
+      
+      // Save the generated recipe to localStorage for the detail page
+      localStorage.setItem('ai-generated-recipe', JSON.stringify(generatedRecipe));
+    } catch (error) {
+      console.error('Failed to generate AI recipe:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   // Get ingredient names for display
   const getIngredientNames = () => {
@@ -115,7 +148,7 @@ const Recipes = () => {
         )}
       </AnimatePresence>
       
-      {matchedRecipes.length > 0 ? (
+      {matchedRecipes.length > 0 || selectedIngredients.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {selectedIngredients.length > 0 && (
             <motion.div
@@ -136,18 +169,28 @@ const Recipes = () => {
                 <p className="text-muted-foreground mb-4">
                   基于您选择的食材，AI为您创建了一道创意菜谱
                 </p>
-                <RecipeCard
-                  id="ai-generated-recipe"
-                  name="AI创意料理：香菇豆腐煲"
-                  image="https://images.unsplash.com/photo-1611891487122-207579d67d98?q=80&w=1000&auto=format&fit=crop"
-                  difficulty="easy"
-                  time={20}
-                  matchPercentage={0.85}
-                  ingredientCount={selectedIngredients.filter(id => 
-                    ['tofu', 'mushroom', 'carrot', 'garlic', 'ginger', 'spring-onion', 'soy-sauce', 'salt', 'sugar'].includes(id)
-                  ).length}
-                  totalIngredients={9}
-                />
+                {isGenerating ? (
+                  <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  </div>
+                ) : aiRecipe ? (
+                  <RecipeCard
+                    id="ai-generated-recipe"
+                    name={aiRecipe.name}
+                    image="https://images.unsplash.com/photo-1611891487122-207579d67d98?q=80&w=1000&auto=format&fit=crop"
+                    difficulty={aiRecipe.difficulty}
+                    time={aiRecipe.time}
+                    matchPercentage={1}
+                    ingredientCount={selectedIngredients.filter(id => 
+                      aiRecipe.ingredients.some(ing => ing.id === id)
+                    ).length}
+                    totalIngredients={aiRecipe.ingredients.length}
+                  />
+                ) : (
+                  <div className="text-center py-6">
+                    <p>正在准备AI创意菜谱...</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -187,18 +230,28 @@ const Recipes = () => {
                 <p className="text-muted-foreground mb-4">
                   虽然没有找到完全匹配的菜谱，但AI为您创建了一道创意菜谱
                 </p>
-                <RecipeCard
-                  id="ai-generated-recipe"
-                  name="AI创意料理：香菇豆腐煲"
-                  image="https://images.unsplash.com/photo-1611891487122-207579d67d98?q=80&w=1000&auto=format&fit=crop"
-                  difficulty="easy"
-                  time={20}
-                  matchPercentage={0.85}
-                  ingredientCount={selectedIngredients.filter(id => 
-                    ['tofu', 'mushroom', 'carrot', 'garlic', 'ginger', 'spring-onion', 'soy-sauce', 'salt', 'sugar'].includes(id)
-                  ).length}
-                  totalIngredients={9}
-                />
+                {isGenerating ? (
+                  <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  </div>
+                ) : aiRecipe ? (
+                  <RecipeCard
+                    id="ai-generated-recipe"
+                    name={aiRecipe.name}
+                    image="https://images.unsplash.com/photo-1611891487122-207579d67d98?q=80&w=1000&auto=format&fit=crop"
+                    difficulty={aiRecipe.difficulty}
+                    time={aiRecipe.time}
+                    matchPercentage={1}
+                    ingredientCount={selectedIngredients.filter(id => 
+                      aiRecipe.ingredients.some(ing => ing.id === id)
+                    ).length}
+                    totalIngredients={aiRecipe.ingredients.length}
+                  />
+                ) : (
+                  <div className="text-center py-6">
+                    <p>正在准备AI创意菜谱...</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

@@ -68,35 +68,6 @@ export const recipes: Recipe[] = [
     tips: ['腌制鸡肉时加入一点淀粉可以保持肉质鲜嫩。', '辣椒可以根据个人口味增减。']
   },
   {
-    id: 'ai-generated-recipe',
-    name: 'AI创意料理：香菇豆腐煲',
-    image: 'https://images.unsplash.com/photo-1611891487122-207579d67d98?q=80&w=1000&auto=format&fit=crop',
-    ingredients: [
-      { id: 'tofu', amount: '300克' },
-      { id: 'mushroom', amount: '100克' },
-      { id: 'carrot', amount: '1个' },
-      { id: 'garlic', amount: '2瓣' },
-      { id: 'ginger', amount: '1小块' },
-      { id: 'spring-onion', amount: '2根' },
-      { id: 'soy-sauce', amount: '2汤匙' },
-      { id: 'salt', amount: '适量' },
-      { id: 'sugar', amount: '1小勺' },
-    ],
-    steps: [
-      '豆腐切成小方块，用热水焯一下，捞出沥干水分。',
-      '香菇洗净切片，胡萝卜切丝。',
-      '热锅倒油，爆香蒜末和姜末。',
-      '加入香菇翻炒至变软。',
-      '放入胡萝卜丝，继续翻炒1分钟。',
-      '加入豆腐块，轻轻翻炒，注意不要弄碎豆腐。',
-      '加入酱油、盐和糖，小火煮3-5分钟。',
-      '撒上葱花，即可出锅。'
-    ],
-    difficulty: 'easy',
-    time: 20,
-    tips: ['豆腐最好选用嫩豆腐，口感更佳。', '可以加入少量淀粉勾芡，使汤汁更浓稠。', '这是AI根据您的食材智能生成的创意菜谱！']
-  },
-  {
     id: 'hot-and-sour-soup',
     name: '酸辣汤',
     image: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=80&w=1000&auto=format&fit=crop',

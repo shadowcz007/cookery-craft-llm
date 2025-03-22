@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -6,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import Layout from '../components/Layout';
 import RecipeDetail from '../components/RecipeDetail';
 import { recipes } from '../data/recipes';
+import { GeneratedRecipe } from '../services/aiService';
 
 const RecipeView = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,8 +17,28 @@ const RecipeView = () => {
     // Simulate loading
     setLoading(true);
     const timeout = setTimeout(() => {
-      const foundRecipe = recipes.find(r => r.id === id);
-      setRecipe(foundRecipe);
+      if (id === 'ai-generated-recipe') {
+        // 从localStorage获取AI生成的菜谱
+        const aiRecipeJson = localStorage.getItem('ai-generated-recipe');
+        if (aiRecipeJson) {
+          try {
+            const aiRecipe = JSON.parse(aiRecipeJson) as GeneratedRecipe;
+            setRecipe({
+              ...aiRecipe,
+              id: 'ai-generated-recipe',
+              image: 'https://images.unsplash.com/photo-1611891487122-207579d67d98?q=80&w=1000&auto=format&fit=crop'
+            });
+          } catch (error) {
+            console.error('Failed to parse AI recipe:', error);
+            setRecipe(undefined);
+          }
+        } else {
+          setRecipe(undefined);
+        }
+      } else {
+        const foundRecipe = recipes.find(r => r.id === id);
+        setRecipe(foundRecipe);
+      }
       setLoading(false);
     }, 500);
     
@@ -62,7 +82,7 @@ const RecipeView = () => {
         <div className="py-20 text-center">
           <h1 className="text-3xl font-bold mb-4">菜谱未找到</h1>
           <p className="text-muted-foreground mb-8">
-            抱歉，我们找不到您要查看的菜谱
+            该菜谱可能已被删除或不存在
           </p>
           <button
             onClick={() => navigate('/recipes')}
