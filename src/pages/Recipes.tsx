@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -118,6 +117,41 @@ const Recipes = () => {
       
       {matchedRecipes.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {selectedIngredients.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="col-span-full mb-4"
+            >
+              <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl p-4 border border-primary/20">
+                <h3 className="text-xl font-semibold mb-2 flex items-center">
+                  <span className="bg-primary/20 text-primary rounded-full p-1 mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2a10 10 0 1 0 10 10 4 4 0 1 1-8 0 4 4 0 0 1 8 0 10 10 0 1 0-10 10" />
+                    </svg>
+                  </span>
+                  AI创意菜谱推荐
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  基于您选择的食材，AI为您创建了一道创意菜谱
+                </p>
+                <RecipeCard
+                  id="ai-generated-recipe"
+                  name="AI创意料理：香菇豆腐煲"
+                  image="https://images.unsplash.com/photo-1611891487122-207579d67d98?q=80&w=1000&auto=format&fit=crop"
+                  difficulty="easy"
+                  time={20}
+                  matchPercentage={0.85}
+                  ingredientCount={selectedIngredients.filter(id => 
+                    ['tofu', 'mushroom', 'carrot', 'garlic', 'ginger', 'spring-onion', 'soy-sauce', 'salt', 'sugar'].includes(id)
+                  ).length}
+                  totalIngredients={9}
+                />
+              </div>
+            </motion.div>
+          )}
+          
           {matchedRecipes.map((recipe, index) => (
             <RecipeCard
               key={recipe.id}
@@ -133,19 +167,56 @@ const Recipes = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-20">
-          <h3 className="text-xl font-semibold mb-2">
-            没有找到匹配的菜谱
-          </h3>
-          <p className="text-muted-foreground mb-6">
-            尝试选择不同的食材组合，或减少所选食材数量
-          </p>
-          <button
-            onClick={() => navigate('/')}
-            className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-4 py-2 font-medium hover:bg-primary/90 transition-colors"
-          >
-            重新选择食材
-          </button>
+        <div>
+          {selectedIngredients.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mb-8"
+            >
+              <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl p-4 border border-primary/20">
+                <h3 className="text-xl font-semibold mb-2 flex items-center">
+                  <span className="bg-primary/20 text-primary rounded-full p-1 mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2a10 10 0 1 0 10 10 4 4 0 1 1-8 0 4 4 0 0 1 8 0 10 10 0 1 0-10 10" />
+                    </svg>
+                  </span>
+                  AI创意菜谱推荐
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  虽然没有找到完全匹配的菜谱，但AI为您创建了一道创意菜谱
+                </p>
+                <RecipeCard
+                  id="ai-generated-recipe"
+                  name="AI创意料理：香菇豆腐煲"
+                  image="https://images.unsplash.com/photo-1611891487122-207579d67d98?q=80&w=1000&auto=format&fit=crop"
+                  difficulty="easy"
+                  time={20}
+                  matchPercentage={0.85}
+                  ingredientCount={selectedIngredients.filter(id => 
+                    ['tofu', 'mushroom', 'carrot', 'garlic', 'ginger', 'spring-onion', 'soy-sauce', 'salt', 'sugar'].includes(id)
+                  ).length}
+                  totalIngredients={9}
+                />
+              </div>
+            </motion.div>
+          )}
+          
+          <div className="text-center py-10">
+            <h3 className="text-xl font-semibold mb-2">
+              没有找到匹配的菜谱
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              尝试选择不同的食材组合，或减少所选食材数量
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-4 py-2 font-medium hover:bg-primary/90 transition-colors"
+            >
+              重新选择食材
+            </button>
+          </div>
         </div>
       )}
     </Layout>

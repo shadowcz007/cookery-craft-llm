@@ -77,7 +77,7 @@ export const ingredientsByCategory = ingredients.reduce((acc, ingredient) => {
   }
   acc[ingredient.category].push(ingredient);
   return acc;
-}, {} as Record<string, Ingredient[]>);
+}, {} as Record<string, typeof ingredients>);
 
 export const categoryNames: Record<string, string> = {
   'vegetable': '蔬菜',
